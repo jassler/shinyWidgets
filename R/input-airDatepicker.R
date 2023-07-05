@@ -1,7 +1,8 @@
 
 #' @title Air Date Picker Input
 #'
-#' @description An alternative to \code{dateInput} to select single, multiple or date range.
+#' @description An alternative to [shiny::dateInput()] to select single, multiple or date range
+#'  based on [Air Datepicker library](https://air-datepicker.com/).
 #'  And two alias to select months or years.
 #'
 #' @param inputId The \code{input} slot that will be used to access the value.
@@ -14,13 +15,15 @@
 #' @param timepicker Add a timepicker below calendar to select time.
 #' @param separator Separator between dates when several are selected, default to \code{" - "}.
 #' @param placeholder A character string giving the user a hint as to what can be entered into the control.
-#' @param dateFormat Format to use to display date(s), default to \code{"yyyy-mm-dd"}.
+#' @param dateFormat Format to use to display date(s), default to \code{"yyyy-MM-dd"},
+#'  see [online documentation](https://air-datepicker.com/docs?scrollTo=dateFormat) for possible values.
 #' @param firstDay Day index from which week will be started. Possible values are from 0 to 6, where
 #'  0 - Sunday and 6 - Saturday. By default value is taken from current localization,
 #'  but if it passed here then it will have higher priority.
 #' @param minDate The minimum allowed date. Either a Date object, or a string in \code{yyyy-mm-dd} format.
 #' @param maxDate The maximum allowed date. Either a Date object, or a string in \code{yyyy-mm-dd} format.
 #' @param disabledDates A vector of dates to disable, e.g. won't be able to select one of dates passed.
+#' @param disabledDaysOfWeek Day(s) of week to disable, numbers from 0 (Sunday) to 6 (Saturday).
 #' @param highlightedDates A vector of dates to highlight.
 #' @param view Starting view, one of \code{'days'} (default), \code{'months'} or \code{'years'}.
 #' @param startView Date shown in calendar when date picker is opened.
@@ -39,22 +42,24 @@
 #' @param addon Display a calendar icon to \code{'right'} or the \code{'left'}
 #'  of the widget, or \code{'none'}. This icon act likes an \code{actionButton},
 #'  you can retrieve value server-side with \code{input$<inputId>_button}.
-#' @param language Language to use, can be one of \code{'cs'}, \code{'da'},
-#'  \code{'de'}, \code{'en'}, \code{'es'}, \code{'fi'}, \code{'fr'},
-#'  \code{'hu'}, \code{'it'}, \code{'nl'}, \code{'pl'}, \code{'pt-BR'}, \code{'pt'},
-#'  \code{'ro'}, \code{'ru'}, \code{'sk'}, \code{'zh'}, \code{'ja'}.
+#' @param addonAttributes A `list()` of additional attributes to use for the addon tag, like `class` for example.
+# paste(sprintf("`%s`", tools::file_path_sans_ext(list.files("node_modules/air-datepicker/locale/", pattern = "\\.js"))), collapse = ", ")
+#' @param language Language to use, can be one of
+#'   `ar`, `cs`, `da`, `de`, `en`, `es`, `fi`, `fr`, `hu`, `it`, `ja`, `ko`, `nl`,
+#'   `pl`, `pt-BR`, `pt`, `ro`, `ru`, `si`, `sk`, `sv`, `th`, `tr`, `uk`, `zh`.
 #' @param inline If \code{TRUE}, datepicker will always be visible.
 #' @param onlyTimepicker Display only the time picker.
 #' @param width The width of the input, e.g. \code{'400px'}, or \code{'100\%'}.
 #' @param toggleSelected When \code{TRUE}, in range mode, it's not possible to select the same date as start and end.
 #' @param ... Arguments passed to \code{airDatepickerInput}.
 #'
-#' @note Since shinyWidgets 0.5.2 there's no more conflicts with \code{dateInput}.
+#' @note Since shinyWidgets 0.5.2 there's no more conflicts with [shiny::dateInput()].
 #'
 #' @return a \code{Date} object or a \code{POSIXct} in UTC timezone.
 #'
-#' @seealso See \code{\link{updateAirDateInput}} for updating slider value server-side.
-#'  And \code{\link{demoAirDatepicker}} for examples.
+#' @seealso
+#'  * [demoAirDatepicker()] for demo apps
+#'  * [updateAirDateInput()] for updating from server
 #'
 #' @name airDatepicker
 #'
@@ -108,11 +113,12 @@ airDatepickerInput <- function(inputId,
                                timepicker = FALSE,
                                separator = " - ",
                                placeholder = NULL,
-                               dateFormat = "yyyy-mm-dd",
+                               dateFormat = "yyyy-MM-dd",
                                firstDay = NULL,
                                minDate = NULL,
                                maxDate = NULL,
                                disabledDates = NULL,
+                               disabledDaysOfWeek = NULL,
                                highlightedDates = NULL,
                                view = c("days", "months", "years"),
                                startView = NULL,
@@ -124,20 +130,25 @@ airDatepickerInput <- function(inputId,
                                timepickerOpts = timepickerOptions(),
                                position = NULL,
                                update_on = c("change", "close"),
+                               onlyTimepicker = FALSE,
+                               toggleSelected = TRUE,
                                addon = c("right", "left", "none"),
+                               addonAttributes = list(class = "btn-outline-secondary"),
                                language = "en",
                                inline = FALSE,
-                               onlyTimepicker = FALSE,
-                               width = NULL,
-                               toggleSelected = TRUE) {
+                               width = NULL) {
   value <- shiny::restoreInput(inputId, value)
   addon <- match.arg(addon)
+  # dput(tools::file_path_sans_ext(list.files("node_modules/air-datepicker/locale/", pattern = "\\.js")))
   language <- match.arg(
     arg = language,
-    choices = c("cs", "da", "de", "en", "es", "fi", "fr", "it", "hu", "nl",
-                "pl", "pt-BR", "pt", "ro", "ru", "sk", "tr", "zh", "ja"),
+    choices = c("ar", "cs", "da", "de", "en", "es", "fi", "fr", "hu", "it",
+                "nl", "pl", "pt-BR", "pt", "ro", "ru", "si", "sk", "sv", "th",
+                "tr", "uk", "zh", "ja", "ko"),
     several.ok = FALSE
   )
+
+  version <- getOption("air-datepicker", default = 3)
 
   list1 <- function(x) {
     if (is.null(x))
@@ -149,18 +160,29 @@ airDatepickerInput <- function(inputId,
     }
   }
 
+  buttons <- character(0)
+  if (clearButton)
+    buttons <- c(buttons, "clear")
+  if (todayButton)
+    buttons <- c(buttons, "today")
+  if (length(buttons) < 1)
+    buttons <- FALSE
+
+
   airParams <- dropNulls(list(
     updateOn = match.arg(update_on),
     disabledDates = list1(disabledDates),
+    disabledDaysOfWeek = list1(disabledDaysOfWeek),
     highlightedDates = list1(highlightedDates),
     startView = startView,
     value = list1(value),
     todayButtonAsDate = inherits(todayButton, c("Date", "POSIXt")),
+    language = toupper(language),
     options = c(dropNulls(list(
       autoClose = isTRUE(autoClose),
-      language = language,
+      language = if (version < 3) language,
       timepicker = isTRUE(timepicker),
-      # startDate = startDate,
+      startDate = startView,
       range = isTRUE(range),
       dateFormat = dateFormat,
       firstDay = firstDay,
@@ -171,7 +193,8 @@ airDatepickerInput <- function(inputId,
       view = match.arg(view),
       minView = match.arg(minView),
       clearButton = isTRUE(clearButton),
-      todayButton = todayButton,
+      todayButton = isTRUE(todayButton),
+      buttons = buttons,
       monthsField = match.arg(monthsField),
       position = position,
       onlyTimepicker = isTRUE(onlyTimepicker),
@@ -193,18 +216,18 @@ airDatepickerInput <- function(inputId,
       tagAir <- tags$div(
         class = "input-group",
         if (identical(addon, "left")) {
-          tags$div(
-            class = "btn action-button input-group-addon",
-            id = paste0(inputId, "_button"),
-            icon("calendar")
+          markup_airdatepicker_input_group_button(
+            inputId = inputId,
+            attributes = addonAttributes,
+            theme_func = shiny::getCurrentTheme
           )
         },
         tagAir,
         if (identical(addon, "right")) {
-          tags$div(
-            class = "btn action-button input-group-addon",
-            id = paste0(inputId, "_button"),
-            icon("calendar")
+          markup_airdatepicker_input_group_button(
+            inputId = inputId,
+            attributes = addonAttributes,
+            theme_func = shiny::getCurrentTheme
           )
         }
       )
@@ -236,16 +259,56 @@ airDatepickerInput <- function(inputId,
     )
   )
 
-  attachDependencies(
-    x = attachShinyWidgetsDep(tagAir, "airdatepicker"),
-    value = htmlDependency(
-      name = paste0("air-datepicker-i18n-", language),
-      version = "2.2.3",
-      src = c(href = "shinyWidgets/air-datepicker2"),
-      script = sprintf("i18n/datepicker.%s.js", language)
-    ), append = TRUE
-  )
+  if (version < 3) {
+    attachDependencies(
+      x = attachShinyWidgetsDep(tagAir, "airdatepicker"),
+      value = htmlDependency(
+        name = paste0("air-datepicker-i18n-", language),
+        version = "2.2.3",
+        src = c(href = "shinyWidgets/air-datepicker2"),
+        script = sprintf("i18n/datepicker.%s.js", language)
+      ), append = TRUE
+    )
+  } else {
+    htmltools::attachDependencies(
+      x = tagAir,
+      value = html_dependency_airdatepicker()
+    )
+  }
 }
+
+
+
+#' @importFrom htmltools tagList tagFunction
+#' @importFrom shiny getCurrentTheme
+#' @importFrom bslib is_bs_theme theme_version
+markup_airdatepicker_input_group_button <- function(inputId, attributes = list(), theme_func = NULL) {
+  tagList(tagFunction(function() {
+    if (is.function(theme_func))
+      theme <- theme_func()
+    default <- tags$div(
+      class = "btn action-button input-group-addon dp-addon",
+      id = paste0(inputId, "_button"),
+      icon("calendar-days"),
+      !!!attributes
+    )
+    if (!bslib::is_bs_theme(theme)) {
+      return(default)
+    }
+    if (bslib::theme_version(theme) %in% c("5")) {
+      bs5 <- tags$button(
+        class = "btn action-button input-group-addon dp-addon",
+        id = paste0(inputId, "_button"),
+        icon("calendar-days"),
+        !!!attributes
+      )
+      return(bs5)
+    }
+    return(default)
+  }))
+}
+
+
 
 
 #' @param dateTimeSeparator Separator between date and time, default to \code{" "}.
@@ -335,14 +398,14 @@ airYearpickerInput <- function(inputId, label = NULL, value = NULL, ...) {
 
 
 
-#' Change the value of \code{\link{airDatepickerInput}} on the client
+#' Change the value of [airDatepickerInput()] on the client
 #'
-#' @param session The \code{session} object passed to function given to \code{shinyServer}.
+#' @param session The `session` object passed to function given to `shinyServer`.
 #' @param inputId The id of the input object.
 #' @param label The label to set for the input object.
 #' @param value The value to set for the input object.
 #' @param clear Logical, clear all previous selected dates.
-#' @param options Options to update, see available ones here: \url{http://t1m0n.name/air-datepicker/docs/}.
+#' @param options Options to update, see available ones in [JavaScript documentation](https://air-datepicker.com/docs)
 #' @param show,hide Show / hide datepicker.
 #'
 #' @export

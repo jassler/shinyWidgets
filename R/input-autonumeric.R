@@ -43,7 +43,8 @@
 #' [this section](https://github.com/autoNumeric/autoNumeric/#predefined-common-options)
 #' of the AutoNumeric Github Page.
 #'
-#' @references Bonneau, Alexandre. 2018. "AutoNumeric.js javascript Package". http://autonumeric.org
+#' @references Bonneau, Alexandre. 2018. "AutoNumeric.js javascript Package".
+#'  \url{http://autonumeric.org}.
 #'
 #' @return a currency input widget that can be added to the UI of a shiny app.
 #' @export
@@ -112,7 +113,6 @@ currencyInput <- function(inputId, label, value, format = "euro",
         json_verbatim = TRUE
       )
     ),
-    html_dependency_shinyWidgets(),
     html_dependency_autonumeric()
   )
 }
@@ -247,6 +247,7 @@ updateFormatNumericInput <- function(session = getDefaultReactiveDomain(),
 #'   element value with the mouse wheel. The wheel behavior can be modified
 #'   by the `wheelStep` option. Defaults to TRUE.
 #' @param emptyInputBehavior Defines what should be displayed in the element if the raw value is an empty string ''.
+#' @param style CSS styles (as a character string) to add to the `<input>` tag.
 #' @param ... Additional parameters that can be passed to AutoNumeric.  See
 #'   details for more information.
 #'
@@ -446,7 +447,7 @@ updateFormatNumericInput <- function(session = getDefaultReactiveDomain(),
 #' }
 autonumericInput <- function(inputId, label, value,
                              width = NULL,
-                             align = "center",
+                             align = "right",
                              currencySymbol = NULL,
                              currencySymbolPlacement = NULL,
                              decimalCharacter = NULL,
@@ -460,6 +461,7 @@ autonumericInput <- function(inputId, label, value,
                              minimumValue = NULL,
                              modifyValueOnWheel = NULL,
                              emptyInputBehavior = "null",
+                             style = NULL,
                              ...) {
   value <- shiny::restoreInput(inputId, value)
 
@@ -499,7 +501,7 @@ autonumericInput <- function(inputId, label, value,
     if (!is.null(label)) tags$label(`for` = inputId, label),
     tags$input(
       type = "text",
-      style = paste0("text-align: ", align, "; font-size: 1.5rem;"),
+      style = paste0("text-align: ", align, ";", style),
       value = value,
       id = inputId,
       class = "form-control autonumeric-input"
@@ -509,7 +511,6 @@ autonumericInput <- function(inputId, label, value,
       `data-for` = inputId,
       data
     ),
-    html_dependency_shinyWidgets(),
     html_dependency_autonumeric()
   )
 }

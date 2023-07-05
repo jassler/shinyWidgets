@@ -1,0 +1,8 @@
+{
+  "virtual-select": "./srcjs/inputs/virtual-select.js",
+  "air-datepicker": "./srcjs/inputs/air-datepicker.js",
+  "multi": "./srcjs/inputs/multi.js",
+  "autonumeric": "./srcjs/inputs/autonumeric.js",
+  "nouislider": "./srcjs/inputs/nouislider.js",
+  "tree": "./srcjs/inputs/tree.js"
+}

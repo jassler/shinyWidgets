@@ -188,7 +188,7 @@ pickerGroupUI <- function(id, params, label = NULL, btn_label = "Reset filters",
     actionLink(
       inputId = ns("reset_all"),
       label = btn_label,
-      icon = icon("remove"),
+      icon = icon("xmark"),
       style = "float: right;"
     )
   )
@@ -261,8 +261,8 @@ pickerGroupServer <- function(input, output, session, data, vars) { # nocov star
       X = vars,
       FUN = function(x) {
         tmp <- aggregate(
-          formula = as.formula(paste("indicator", x, sep = "~")),
-          data = data,
+          list(indicator = data$indicator),
+          by = setNames(list(data[[x]]), x),
           FUN = Reduce, f = `|`
         )
         updatePickerInput(

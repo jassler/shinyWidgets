@@ -9,6 +9,7 @@
 #' @param label Character, global label on top of all labels.
 #' @param btn_label Character, reset button label.
 #' @param inline If `TRUE` (the default), `selectizeInput`s are horizontally positioned, otherwise vertically.
+#'  Use this argument in `selectizeGroupUI` **and** in `selectizeGroupServer` to make it work properly.
 #'
 #' @return a [shiny::reactive()] function containing data filtered.
 #' @export
@@ -22,6 +23,14 @@
 #' @example examples/selectizeGroup-vars.R
 #' @example examples/selectizeGroup-subset.R
 selectizeGroupUI <- function(id, params, label = NULL, btn_label = "Reset filters", inline = TRUE) {
+
+  .Deprecated(
+    msg = paste(
+      "selectizeGroupUI/selectizeGroupServer have been deprecated and will be removed in a future release of shinyWidgets.",
+      "For a replacement see module select_group_ui / select_group_server in package datamods: ",
+      "https://dreamrs.github.io/datamods/reference/select-group.html"
+    )
+  )
 
   # Namespace
   ns <- NS(id)
@@ -40,7 +49,7 @@ selectizeGroupUI <- function(id, params, label = NULL, btn_label = "Reset filter
               class = "btn-group",
               id = ns(paste0("container-", input$inputId)),
               selectizeInput(
-                inputId = ns(input$inputId),
+                inputId = ns(ws2underscore(input$inputId)),
                 label = input$label %||% input$title,
                 choices = input$choices,
                 selected = input$selected,
@@ -60,7 +69,7 @@ selectizeGroupUI <- function(id, params, label = NULL, btn_label = "Reset filter
       actionLink(
         inputId = ns("reset_all"),
         label = btn_label,
-        icon = icon("times"),
+        icon = icon("xmark"),
         style = "float: right;"
       )
     )
@@ -74,7 +83,7 @@ selectizeGroupUI <- function(id, params, label = NULL, btn_label = "Reset filter
           tagSelect <- tags$div(
             id = ns(paste0("container-", input$inputId)),
             selectizeInput(
-              inputId = ns(input$inputId),
+              inputId = ns(ws2underscore(input$inputId)),
               label = input$label %||% input$title,
               choices = input$choices,
               selected = input$selected,
@@ -93,7 +102,7 @@ selectizeGroupUI <- function(id, params, label = NULL, btn_label = "Reset filter
       actionLink(
         inputId = ns("reset_all"),
         label = btn_label,
-        icon = icon("times"),
+        icon = icon("xmark"),
         style = "float: right;"
       )
     )
@@ -121,12 +130,11 @@ selectizeGroupUI <- function(id, params, label = NULL, btn_label = "Reset filter
 #' @param vars character, columns to use to create filters,
 #'  must correspond to variables listed in \code{params}. Can be a
 #'  \code{reactive} function, but values must be included in the initial ones (in \code{params}).
-#' @param inline If \code{TRUE} (the default), `selectizeInput`s are horizontally positioned, otherwise vertically.
 #'
 #' @export
 #'
 #' @rdname selectizeGroup-module
-#' @importFrom shiny updateSelectizeInput observeEvent reactiveValues reactive is.reactive
+#' @importFrom shiny updateSelectizeInput observeEvent reactiveValues reactive is.reactive isolate
 selectizeGroupServer <- function(input, output, session, data, vars, inline = TRUE) { # nocov start
 
   # Namespace
@@ -169,8 +177,9 @@ selectizeGroupServer <- function(input, output, session, data, vars, inline = TR
         vals <- sort(unique(rv$data[[x]]))
         updateSelectizeInput(
           session = session,
-          inputId = x,
+          inputId = ws2underscore(x),
           choices = vals,
+          selected = isolate(input[[x]]),
           server = TRUE
         )
       }
@@ -184,7 +193,7 @@ selectizeGroupServer <- function(input, output, session, data, vars, inline = TR
         vals <- sort(unique(rv$data[[x]]))
         updateSelectizeInput(
           session = session,
-          inputId = x,
+          inputId = ws2underscore(x),
           choices = vals,
           server = TRUE
         )
@@ -201,14 +210,14 @@ selectizeGroupServer <- function(input, output, session, data, vars, inline = TR
 
         ovars <- vars[vars != x]
 
-        observeEvent(input[[x]], {
+        observeEvent(input[[ws2underscore(x)]], {
 
           data <- rv$data
 
           indicator <- lapply(
             X = vars,
             FUN = function(x) {
-              data[[x]] %inT% input[[x]]
+              data[[x]] %inT% input[[ws2underscore(x)]]
             }
           )
           indicator <- Reduce(f = `&`, x = indicator)
@@ -221,20 +230,20 @@ selectizeGroupServer <- function(input, output, session, data, vars, inline = TR
           }
 
           for (i in ovars) {
-            if (is.null(input[[i]])) {
+            if (is.null(input[[ws2underscore(i)]])) {
               updateSelectizeInput(
                 session = session,
-                inputId = i,
+                inputId = ws2underscore(i),
                 choices = sort(unique(data[[i]])),
                 server = TRUE
               )
             }
           }
 
-          if (is.null(input[[x]])) {
+          if (is.null(input[[ws2underscore(x)]])) {
             updateSelectizeInput(
               session = session,
-              inputId = x,
+              inputId = ws2underscore(x),
               choices = sort(unique(data[[x]])),
               server = TRUE
             )
@@ -252,7 +261,7 @@ selectizeGroupServer <- function(input, output, session, data, vars, inline = TR
     indicator <- lapply(
       X = vars,
       FUN = function(x) {
-        data[[x]] %inT% input[[x]]
+        data[[x]] %inT% input[[ws2underscore(x)]]
       }
     )
     indicator <- Reduce(f = `&`, x = indicator)

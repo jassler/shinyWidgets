@@ -1,12 +1,151 @@
-shinyWidgets 0.6.2.9000
+shinyWidgets 0.8.0
 ======================
 
-* `checkboxGroupButtons()`/`radioGroupButtons()` fixed `justified = TRUE` argument compatibility with Bootstrap 4 (fix [#423](https://github.com/dreamRs/shinyWidgets/issues/423))
+* `airDatepickerInput()` : added argument `disabledDaysOfWeek` to disable day(s) of the week.
+* `materialSwitch()` : click on the label now toggle the switch [#582](https://github.com/dreamRs/shinyWidgets/issues/582).
+* Updated virtual-select-plugin to 1.0.39 (fix [#601](https://github.com/dreamRs/shinyWidgets/issues/601)).
+* Updated sweetalert2 to v11.7.11.
+* Updated air-datepicker to 3.3.5.
+
+
+### Bug fixes
+
+* `verticalTabsetPanel()` does not render output content when using Bootstrap 5 [#570](https://github.com/dreamRs/shinyWidgets/issues/570).
+* `virtualSelectInput` : fixed crash with choices=list() [#571](https://github.com/dreamRs/shinyWidgets/issues/571).
+
+
+### Deprecated functions
+
+* `useShinydashboard()`, `useShinydashboardPlus()`, `useTablerDash()`, `useArgonDash()`, `useBs4Dash()`, `setShadow()`, `setSliderColor()` are deprecated and will be removed in a future release.
+* `selectizeGroupUI/selectizeGroupServer` module is deprecated, use equivalent [Select Group Input Module](https://dreamrs.github.io/datamods/reference/select-group.html) in package [datamods](https://github.com/dreamRs/datamods/)
+
+
+
+shinyWidgets 0.7.6
+======================
+
+* Updated virtual-select-plugin to 1.0.37.
+* Updated air-datepicker to 3.3.3, fix [#553](https://github.com/dreamRs/shinyWidgets/issues/553).
+
+
+### Bug fixes
+
+* `verticalTabsetPanel()` does not work with bslib using Bootstrap 5 [#549](https://github.com/dreamRs/shinyWidgets/issues/549).
+
+
+
+shinyWidgets 0.7.5
+======================
+
+* Updated virtual-select-plugin to 1.0.34.
+* Updated air-datepicker to 3.3.1 with language support for japanese and korean.
+* Updated `treeInput()` collapse and expand methods (in javascript).
+
+
+### Bug fixes
+
+* `multiInput()` is no longer renders HTML tags inside values [#545](https://github.com/dreamRs/shinyWidgets/issues/545).
+* `awesomeCheckboxGroup()` errors when colon in choices [#543](https://github.com/dreamRs/shinyWidgets/issues/543).
+
+
+
+
+shinyWidgets 0.7.4
+======================
+
+* New widget `treeInput()` based on [treejs](https://github.com/daweilv/treejs) library.
+* Updated virtual-select-plugin to 1.0.33.
+* `updateVirtualSelect()` has a new argument `disabledChoices` to disable some choices from the menu.
+* It's now possible to use variable with space in their name in `selectizeGroup` module, thanks to [@evgeniyftw](https://github.com/evgeniyftw).
+
+
+### Bug fixes
+
+* `switchInput()` produced an error when using `bslib::bs_theme(version = "3")` [#528](https://github.com/dreamRs/shinyWidgets/issues/528).
+* Fixed a bug in `pickerGroup` module when using `aggregate` [#491](https://github.com/dreamRs/shinyWidgets/issues/491).
+* Fixed highlightedDates no longer works for `airDatePicker()` [#532](https://github.com/dreamRs/shinyWidgets/issues/532).
+
+
+
+
+shinyWidgets 0.7.3
+======================
+
+* Updated [air-datepicker](https://github.com/t1m0n/air-datepicker) to 3.2.1 with language support for italian and arabic.
+* Fixed `airDatepickerInput()` z-index and buttons.
+* `dropdown()`: added `block` & `no_outline` arguments.
+* `actionBttn()`: added ability to pass arguments to tag container.
+* `autonumericInput()`: remove custom CSS styles
+
+
+### Bug fixes
+
+* `pickerInput`'s custom input to know if the menu is open or closed wasn't working anymore after using `updatePickerInput` [#522](https://github.com/dreamRs/shinyWidgets/issues/522)
+
+
+
+
+shinyWidgets 0.7.2
+======================
+
+* Updated [air-datepicker](https://github.com/t1m0n/air-datepicker) library to latest version (3.2.0), updating bindings to use [dayjs](https://github.com/iamkun/dayjs/) to manipulate date.
+* `updateNoUiSliderInput()`: new argument `label =` to update the widget's label.
+
+## Breaking changes
+
+* `airDatepickerInput()`: argument `dateFormat` has a new notation, default value changed from `yyyy-mm-dd` to `yyyy-MM-dd`. See https://air-datepicker.com/docs?scrollTo=dateFormat for potential alues.
+
+
+
+
+
+shinyWidgets 0.7.1
+======================
+
+* Updated virtual-select-plugin to 1.0.30
+* `pickerInput` bindings: fixed update method when using Bootstrap 5.
+* `virtualSelectInput` state (opened or closed) is now available with `input$<inputId>_open`.
+
+
+
+shinyWidgets 0.7.0
+======================
+
+* New widget `virtualSelectInput()`, a select dropdown widget that support a lot of choices, based on [virtual-select](https://github.com/sa-si-dev/virtual-select) JavaScript library.
+* Updated bootstrap-select to v1.14.0-beta3, to make `pickerInput()` works with Bootstrap 5.
+* Updated `alert()` and `panel()` Bootstrap utilities to work with Bootstrap 5.
+
+### Bug fixes
+* Removed `formula` argument from `aggregate()` to accomode to R 4.2.0 (fix [#491](https://github.com/dreamRs/shinyWidgets/issues/491))
+
+
+
+shinyWidgets 0.6.4
+======================
+
+### Bug fixes
+* Revert `bootstrap-switch-js` to 3.3.4 to fix bug when `value = TRUE`.
+* Fixed a bug in `colorSelectorInput()` causing not returning an input value.
+
+
+
+shinyWidgets 0.6.3
+======================
+
+*  Following functions are now compatible with Bootstrap 4 & 5, when using `bslib::bs_theme()` :
+    + `radioGroupButtons()`
+    + `checkboxGroupButtons()`
+    + `textInputIcon()`
+    + `numericInputIcon()`
 * `checkboxGroupButtons()`/`radioGroupButtons()`: `status` argument now accept a vector, thanks to [@jassler](https://github.com/jassler) ([#440](https://github.com/dreamRs/shinyWidgets/pull/440))
+* `downloadBttn()` now has a `icon` argument.
+* `switchInput()` is now themable with {bslib}, thanks to [@AshesITR](https://github.com/AshesITR) ([#454](https://github.com/dreamRs/shinyWidgets/pull/454))
 
 ### Bug fixes
 * `updateNumericRangeInput()` failed to correctly update `label` ([#441](https://github.com/dreamRs/shinyWidgets/issues/441))
-
+* `verticalTabsetPanel()` didn't work inside `renderUI` and with more than one panel ([#446](https://github.com/dreamRs/shinyWidgets/issues/446))
+* `statiCard()`: fixed rendering in `renderUI` and value not displayed if animation interrupted ([#406](https://github.com/dreamRs/shinyWidgets/issues/406), [#407](https://github.com/dreamRs/shinyWidgets/issues/407))
+* `checkboxGroupButtons()`/`radioGroupButtons()` fixed `justified = TRUE` argument compatibility with Bootstrap 4 (fix [#423](https://github.com/dreamRs/shinyWidgets/issues/423))
 
 
 shinyWidgets 0.6.2

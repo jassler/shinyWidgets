@@ -35,8 +35,8 @@
 #' @param width The width of the input, e.g. `400px`, or `100%`.
 #' @param height The height of the input, e.g. `400px`, or `100%`.
 #'
-#' @note See \code{\link{updateNoUiSliderInput}} for updating slider value server-side.
-#'  And \code{\link{demoNoUiSlider}} for examples.
+#' @note See [updateNoUiSliderInput()] for updating slider value server-side.
+#'  And [demoNoUiSlider()] for examples.
 #'
 #' @return a ui definition
 #' @export
@@ -44,55 +44,7 @@
 #' @importFrom htmltools tags validateCssUnit
 #' @importFrom jsonlite toJSON
 #'
-#' @examples
-#' if (interactive()) {
-#'
-#' ### examples ----
-#'
-#' # see ?demoNoUiSlider
-#' demoNoUiSlider("more")
-#'
-#'
-#' ###  basic usage ----
-#'
-#' library( shiny )
-#' library( shinyWidgets )
-#'
-#'
-#' ui <- fluidPage(
-#'
-#'   tags$br(),
-#'
-#'   noUiSliderInput(
-#'     inputId = "noui1",
-#'     min = 0, max = 100,
-#'     value = 20
-#'   ),
-#'   verbatimTextOutput(outputId = "res1"),
-#'
-#'   tags$br(),
-#'
-#'   noUiSliderInput(
-#'     inputId = "noui2", label = "Slider vertical:",
-#'     min = 0, max = 1000, step = 50,
-#'     value = c(100, 400), margin = 100,
-#'     orientation = "vertical",
-#'     width = "100px", height = "300px"
-#'   ),
-#'   verbatimTextOutput(outputId = "res2")
-#'
-#' )
-#'
-#' server <- function(input, output, session) {
-#'
-#'   output$res1 <- renderPrint(input$noui1)
-#'   output$res2 <- renderPrint(input$noui2)
-#'
-#' }
-#'
-#' shinyApp(ui, server)
-#'
-#' }
+#' @example examples/noUiSlider.R
 noUiSliderInput <- function(inputId, label = NULL, min, max, value,
                             step = NULL, tooltips = TRUE,
                             connect = TRUE, padding = 0,
@@ -129,15 +81,18 @@ noUiSliderInput <- function(inputId, label = NULL, min, max, value,
     behaviour = behaviour,
     format = format
   ))
-  tagLabel <- tags$label(
-    `for` = inputId, label
-  )
-  noUiTag <- tags$div(
+  tags$div(
     class = "form-group shiny-input-container",
     class = if (inline) "shiny-input-container-inline",
     style = if (!is.null(width)) paste0("width: ", validateCssUnit(width), ";"),
     style = if (inline) "display: inline-block;",
-    if (!is.null(label)) tagLabel,
+    tags$label(
+      `for` = inputId,
+      class = "control-label",
+      class = if (is.null(label)) "shiny-label-null",
+      id = paste0(inputId, "-label"),
+      label
+    ),
     tags$div(
       style = if (!is.null(pips)) "margin-bottom: 40px;",
       style = if (tooltips) "padding-left: 10px;",
@@ -153,9 +108,9 @@ noUiSliderInput <- function(inputId, label = NULL, min, max, value,
         `data-for` = inputId,
         jsonlite::toJSON(noUiProps, auto_unbox = TRUE, json_verbatim = TRUE)
       )
-    )
+    ),
+    html_dependency_nouislider()
   )
-  attachShinyWidgetsDep(noUiTag, "nouislider")
 }
 
 
@@ -225,9 +180,12 @@ noUiSliderInput <- function(inputId, label = NULL, min, max, value,
 #' shinyApp(ui, server)
 #'
 #' }
-wNumbFormat <- function(decimals = NULL, mark = NULL,
-                       thousand = NULL, prefix = NULL,
-                       suffix = NULL, negative = NULL) {
+wNumbFormat <- function(decimals = NULL,
+                        mark = NULL,
+                        thousand = NULL,
+                        prefix = NULL,
+                        suffix = NULL,
+                        negative = NULL) {
   params <- dropNulls(list(
     decimals = decimals, mark = mark,
     thousand = thousand, prefix = prefix,
@@ -246,12 +204,15 @@ wNumbFormat <- function(decimals = NULL, mark = NULL,
 
 #' Change the value of a no ui slider input on the client
 #'
-#' @param session The \code{session} object passed to function given to \code{shinyServer}.
+#' @param session The `session` object passed to function given to `shinyServer`.
 #' @param inputId The id of the input object.
+#' @param label The new label.
 #' @param value The new value.
-#' @param range The new range, must be of length 2 with \code{c(min, max)}.
+#' @param range The new range, must be of length 2 with `c(min, max)`.
 #' @param disable logical, disable or not the slider,
-#'  if disabled the user can no longer modify the slider value
+#'  if disabled the user can no longer modify the slider value.
+#'
+#' @seealso [noUiSliderInput()]
 #'
 #' @export
 #'
@@ -263,6 +224,7 @@ wNumbFormat <- function(decimals = NULL, mark = NULL,
 #' }
 updateNoUiSliderInput <- function(session = getDefaultReactiveDomain(),
                                   inputId,
+                                  label = NULL,
                                   value = NULL,
                                   range = NULL,
                                   disable = FALSE) {
@@ -270,7 +232,12 @@ updateNoUiSliderInput <- function(session = getDefaultReactiveDomain(),
     range <- NULL
     warning("'range' must be of length 2, value will be ignored.")
   }
-  message <- dropNulls(list(value = value, range = range, disable = disable))
+  message <- dropNulls(list(
+    label = label,
+    value = value,
+    range = range,
+    disable = disable
+  ))
   session$sendInputMessage(inputId, message)
 }
 

@@ -90,27 +90,15 @@ a ui definition
 A minimal numeric range slider with a lot of features.
 }
 \note{
-See \code{\link{updateNoUiSliderInput}} for updating slider value server-side.
-And \code{\link{demoNoUiSlider}} for examples.
+See \code{\link[=updateNoUiSliderInput]{updateNoUiSliderInput()}} for updating slider value server-side.
+And \code{\link[=demoNoUiSlider]{demoNoUiSlider()}} for examples.
 }
 \examples{
-if (interactive()) {
-
-### examples ----
-
-# see ?demoNoUiSlider
-demoNoUiSlider("more")
-
-
-###  basic usage ----
-
-library( shiny )
-library( shinyWidgets )
-
+library(shiny)
+library(shinyWidgets)
 
 ui <- fluidPage(
-
-  tags$br(),
+  tags$h2("noUiSliderInput example"),
 
   noUiSliderInput(
     inputId = "noui1",
@@ -129,7 +117,6 @@ ui <- fluidPage(
     width = "100px", height = "300px"
   ),
   verbatimTextOutput(outputId = "res2")
-
 )
 
 server <- function(input, output, session) {
@@ -139,7 +126,6 @@ server <- function(input, output, session) {
 
 }
 
-shinyApp(ui, server)
-
-}
+if (interactive())
+  shinyApp(ui, server)
 }

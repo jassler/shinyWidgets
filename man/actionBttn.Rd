@@ -12,7 +12,8 @@ actionBttn(
   color = "default",
   size = "md",
   block = FALSE,
-  no_outline = TRUE
+  no_outline = TRUE,
+  ...
 )
 }
 \arguments{
@@ -35,9 +36,11 @@ actionBttn(
 
 \item{no_outline}{Logical, don't show outline when navigating with
 keyboard/interact using mouse or touch.}
+
+\item{...}{Other arguments to pass to the container tag function.}
 }
 \description{
-Like \code{actionButton} but awesome, via \url{https://bttn.surge.sh/}
+Like \code{\link[shiny:actionButton]{shiny::actionButton()}} but awesome, via \url{https://bttn.surge.sh/}
 }
 \examples{
 if (interactive()) {
@@ -79,5 +82,5 @@ shinyApp(ui = ui, server = server)
 }
 }
 \seealso{
-\link{downloadBttn}
+\code{\link[=downloadBttn]{downloadBttn()}}
 }

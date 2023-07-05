@@ -17,11 +17,12 @@ airDatepickerInput(
   timepicker = FALSE,
   separator = " - ",
   placeholder = NULL,
-  dateFormat = "yyyy-mm-dd",
+  dateFormat = "yyyy-MM-dd",
   firstDay = NULL,
   minDate = NULL,
   maxDate = NULL,
   disabledDates = NULL,
+  disabledDaysOfWeek = NULL,
   highlightedDates = NULL,
   view = c("days", "months", "years"),
   startView = NULL,
@@ -33,12 +34,13 @@ airDatepickerInput(
   timepickerOpts = timepickerOptions(),
   position = NULL,
   update_on = c("change", "close"),
+  onlyTimepicker = FALSE,
+  toggleSelected = TRUE,
   addon = c("right", "left", "none"),
+  addonAttributes = list(class = "btn-outline-secondary"),
   language = "en",
   inline = FALSE,
-  onlyTimepicker = FALSE,
-  width = NULL,
-  toggleSelected = TRUE
+  width = NULL
 )
 
 timepickerOptions(
@@ -75,7 +77,8 @@ If \code{numeric} is passed, then amount of selected dates will be limited by it
 
 \item{placeholder}{A character string giving the user a hint as to what can be entered into the control.}
 
-\item{dateFormat}{Format to use to display date(s), default to \code{"yyyy-mm-dd"}.}
+\item{dateFormat}{Format to use to display date(s), default to \code{"yyyy-MM-dd"},
+see \href{https://air-datepicker.com/docs?scrollTo=dateFormat}{online documentation} for possible values.}
 
 \item{firstDay}{Day index from which week will be started. Possible values are from 0 to 6, where
 0 - Sunday and 6 - Saturday. By default value is taken from current localization,
@@ -86,6 +89,8 @@ but if it passed here then it will have higher priority.}
 \item{maxDate}{The maximum allowed date. Either a Date object, or a string in \code{yyyy-mm-dd} format.}
 
 \item{disabledDates}{A vector of dates to disable, e.g. won't be able to select one of dates passed.}
+
+\item{disabledDaysOfWeek}{Day(s) of week to disable, numbers from 0 (Sunday) to 6 (Saturday).}
 
 \item{highlightedDates}{A vector of dates to highlight.}
 
@@ -113,22 +118,23 @@ if a \code{Date} is used, it will set view to the given date and select it..}
 \item{update_on}{When to send selected value to server: on \code{'change'}
 or when calendar is \code{'close'}d.}
 
+\item{onlyTimepicker}{Display only the time picker.}
+
+\item{toggleSelected}{When \code{TRUE}, in range mode, it's not possible to select the same date as start and end.}
+
 \item{addon}{Display a calendar icon to \code{'right'} or the \code{'left'}
 of the widget, or \code{'none'}. This icon act likes an \code{actionButton},
 you can retrieve value server-side with \code{input$<inputId>_button}.}
 
-\item{language}{Language to use, can be one of \code{'cs'}, \code{'da'},
-\code{'de'}, \code{'en'}, \code{'es'}, \code{'fi'}, \code{'fr'},
-\code{'hu'}, \code{'it'}, \code{'nl'}, \code{'pl'}, \code{'pt-BR'}, \code{'pt'},
-\code{'ro'}, \code{'ru'}, \code{'sk'}, \code{'zh'}, \code{'ja'}.}
+\item{addonAttributes}{A \code{list()} of additional attributes to use for the addon tag, like \code{class} for example.}
+
+\item{language}{Language to use, can be one of
+\code{ar}, \code{cs}, \code{da}, \code{de}, \code{en}, \code{es}, \code{fi}, \code{fr}, \code{hu}, \code{it}, \code{ja}, \code{ko}, \code{nl},
+\code{pl}, \code{pt-BR}, \code{pt}, \code{ro}, \code{ru}, \code{si}, \code{sk}, \code{sv}, \code{th}, \code{tr}, \code{uk}, \code{zh}.}
 
 \item{inline}{If \code{TRUE}, datepicker will always be visible.}
 
-\item{onlyTimepicker}{Display only the time picker.}
-
 \item{width}{The width of the input, e.g. \code{'400px'}, or \code{'100\%'}.}
-
-\item{toggleSelected}{When \code{TRUE}, in range mode, it's not possible to select the same date as start and end.}
 
 \item{dateTimeSeparator}{Separator between date and time, default to \code{" "}.}
 
@@ -154,11 +160,12 @@ you can retrieve value server-side with \code{input$<inputId>_button}.}
 a \code{Date} object or a \code{POSIXct} in UTC timezone.
 }
 \description{
-An alternative to \code{dateInput} to select single, multiple or date range.
+An alternative to \code{\link[shiny:dateInput]{shiny::dateInput()}} to select single, multiple or date range
+based on \href{https://air-datepicker.com/}{Air Datepicker library}.
 And two alias to select months or years.
 }
 \note{
-Since shinyWidgets 0.5.2 there's no more conflicts with \code{dateInput}.
+Since shinyWidgets 0.5.2 there's no more conflicts with \code{\link[shiny:dateInput]{shiny::dateInput()}}.
 }
 \examples{
 if (interactive()) {
@@ -198,6 +205,8 @@ shinyApp(ui, server)
 }
 }
 \seealso{
-See \code{\link{updateAirDateInput}} for updating slider value server-side.
-And \code{\link{demoAirDatepicker}} for examples.
+\itemize{
+\item \code{\link[=demoAirDatepicker]{demoAirDatepicker()}} for demo apps
+\item \code{\link[=updateAirDateInput]{updateAirDateInput()}} for updating from server
+}
 }

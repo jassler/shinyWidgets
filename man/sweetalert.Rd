@@ -63,7 +63,8 @@ the modal by clicking outside of it, or not.}
 Show an alert message to the user to provide some feedback.
 }
 \note{
-This function use the JavaScript sweetalert2 library, see the official documentation for more https://sweetalert2.github.io/.
+This function use the JavaScript sweetalert2 library, see the official
+documentation for more \url{https://sweetalert2.github.io/}.
 }
 \examples{
 library(shiny)
@@ -79,7 +80,7 @@ ui <- fluidPage(
   actionButton(
     inputId = "error",
     label = "Launch an error sweet alert",
-    icon = icon("remove")
+    icon = icon("xmark")
   ),
   actionButton(
     inputId = "sw_html",

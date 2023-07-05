@@ -33,8 +33,16 @@ dropNullsOrNA <- function(x) {
   x[!vapply(x, nullOrNA, FUN.VALUE = logical(1))]
 }
 nullOrNA <- function(x) {
-  is.null(x) || is.na(x)
+  is.null(x) || (length(x) == 1 && is.na(x))
 }
+
+dropNullsOrEmpty <- function(x) {
+  x[!vapply(x, null_or_empty, FUN.VALUE = logical(1))]
+}
+null_or_empty <- function(x) {
+  is.null(x) || length(x) == 0
+}
+
 
 # choicesWithNames
 choicesWithNames <- function(choices) {
@@ -48,7 +56,7 @@ choicesWithNames <- function(choices) {
       if (is.list(val))
         listify(val)
       else if (length(val) == 1 && is.null(names(val)))
-        val
+        as.character(val)
       else makeNamed(as.list(val))
     })
     makeNamed(res)
@@ -173,3 +181,11 @@ formatNoSci <- function(x) {
   if (is.null(x)) return(NULL)
   format(x, scientific = FALSE, digits = 15)
 }
+
+
+sanitize <- function(x) {
+  x <- gsub("[[:punct:]]+", "", x)
+  x <- gsub("[[:space:]]+", "_", x)
+  paste0("id", x)
+}
+

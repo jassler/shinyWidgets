@@ -55,7 +55,7 @@
 #'       label_on = "NAs keeped",
 #'       label_off = "NAs removed",
 #'       icon_on = icon("check"),
-#'       icon_off = icon("remove")
+#'       icon_off = icon("xmark")
 #'     )
 #'   ),
 #'   tags$div(style = "height: 140px;"), # spacing

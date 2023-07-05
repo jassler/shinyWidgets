@@ -11,7 +11,10 @@
 #' @param choiceValues List of values corresponding to \code{choiceNames}.
 #' @param options List of options passed to multi (\code{enable_search = FALSE} for disabling the search bar for example).
 #'
-#' @return A multiselect control
+#' @return A multiselect control that can be added to the UI of a shiny app.
+#'
+#' @references Fabian Lindfors, "A user-friendly replacement for select boxes with multiple attribute enabled",
+#'  \url{https://github.com/fabianlindfors/multi.js}.
 #'
 #' @importFrom jsonlite toJSON
 #' @importFrom htmltools validateCssUnit tags
@@ -79,24 +82,43 @@
 #' shinyApp(ui = ui, server = server)
 #'
 #' }
-multiInput <- function(inputId, label, choices = NULL, selected = NULL, options = NULL, width = NULL, choiceNames = NULL, choiceValues = NULL) {
+multiInput <- function(inputId,
+                       label,
+                       choices = NULL,
+                       selected = NULL,
+                       options = NULL,
+                       width = NULL,
+                       choiceNames = NULL,
+                       choiceValues = NULL) {
   selected <- shiny::restoreInput(id = inputId, default = selected)
-  selectTag <- htmltools::tags$select(
+  selectTag <- tags$select(
     id = inputId, multiple = "multiple", class= "form-control multijs",
-    makeChoices(choices = choices, choiceNames = choiceNames,
-                choiceValues = choiceValues, selected = selected)
-  )
-  multiTag <- htmltools::tags$div(
-    class = "form-group shiny-input-container",
-    style = if(!is.null(width)) paste("width:", htmltools::validateCssUnit(width)),
-    htmltools::tags$label(class = "control-label", `for` = inputId, label),
-    selectTag,
-    tags$script(
-      type = "application/json", `data-for` = inputId,
-      jsonlite::toJSON(options, auto_unbox = TRUE, json_verbatim = TRUE)
+    makeChoices(
+      choices = choices,
+      choiceNames = choiceNames,
+      choiceValues = choiceValues,
+      selected = selected
     )
   )
-  attachShinyWidgetsDep(multiTag, "multi")
+  tags$div(
+    class = "form-group shiny-input-container",
+    style = if (!is.null(width)) paste("width:", validateCssUnit(width)),
+    tags$label(
+      id = paste0(inputId, "-label"),
+      class = "control-label",
+      class = if (is.null(label)) "shiny-label-null",
+      `for` = inputId,
+      label
+    ),
+    selectTag,
+    tags$script(
+      type = "application/json",
+      `data-for` = inputId,
+      jsonlite::toJSON(options, auto_unbox = TRUE, json_verbatim = TRUE)
+    ),
+    html_dependency_shinyWidgets(),
+    html_dependency_multi()
+  )
 }
 
 
@@ -115,8 +137,11 @@ makeChoices <- function(choices = NULL, choiceNames = NULL, choiceValues = NULL,
       lapply(
         X = seq_along(choiceNames),
         FUN = function(i) {
-          htmltools::tags$option(value = choiceValues[[i]], as.character(choiceNames[[i]]),
-                      selected = if(choiceValues[[i]] %in% selected) "selected")
+          htmltools::tags$option(
+            value = choiceValues[[i]],
+            as.character(choiceNames[[i]]),
+            selected = if(choiceValues[[i]] %in% selected) "selected"
+          )
         }
       )
     )
@@ -125,8 +150,11 @@ makeChoices <- function(choices = NULL, choiceNames = NULL, choiceValues = NULL,
     tagList(
       lapply(
         X = seq_along(choices), FUN = function(i) {
-          htmltools::tags$option(value = choices[[i]], names(choices)[i],
-                      selected = if(choices[[i]] %in% selected) "selected")
+          htmltools::tags$option(
+            value = choices[[i]],
+            names(choices)[i],
+            selected = if(choices[[i]] %in% selected) "selected"
+          )
         }
       )
     )

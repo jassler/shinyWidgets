@@ -14,6 +14,7 @@ test_that("Default", {
     choices = choices
   )
   choicestag <- cbtag$children[[3]]$children[[1]]$children[[1]]
+  choicestag <- choicestag()
   expect_length(choicestag, length(choices))
 
   checked <- lapply(choicestag, function(x) grepl(pattern = "checked", x = as.character(x)))
@@ -33,6 +34,7 @@ test_that("With choices", {
   )
 
   choicestag <- cbtag$children[[3]]$children[[1]]$children[[1]]
+  choicestag <- choicestag()
   expect_length(choicestag, length(choices))
 
   checked <- lapply(choicestag, function(x) grepl(pattern = "checked", x = as.character(x)))
@@ -51,6 +53,7 @@ test_that("Danger status", {
   )
 
   choicestag <- cbtag$children[[3]]$children[[1]]$children[[1]]
+  choicestag <- choicestag()
   danger <- lapply(choicestag, function(x) grepl(pattern = "danger", x = as.character(x)))
   danger <- unlist(danger)
   expect_true(all(danger))
@@ -67,6 +70,7 @@ test_that("Success status", {
   )
 
   choicestag <- cbtag$children[[3]]$children[[1]]$children[[1]]
+  choicestag <- choicestag()
   success <- lapply(choicestag, function(x) grepl(pattern = "success", x = as.character(x)))
   success <- unlist(success)
   expect_true(all(success))
@@ -85,6 +89,7 @@ test_that("Multiple status", {
 
   status <- c("success", "primary", "secondary", "success")
   choicestag <- cbtag$children[[3]]$children[[1]]$children[[1]]
+  choicestag <- choicestag()
   success <- lapply(seq_along(choicestag), function(x) grepl(pattern = status[x], x = as.character(choicestag[x])))
   success <- unlist(success)
   expect_true(all(success))
@@ -140,14 +145,14 @@ test_that("Icons button", {
     label = "Choose a graph :",
     choiceNames = list(
       shiny::icon("gear"),
-      shiny::icon("cogs")
+      shiny::icon("gears")
     ),
     choiceValues = c("A", "B"),
     justified = TRUE
   )
   cbtag <- as.character(cbtag)
   expect_true(grepl(pattern = as.character(shiny::icon("gear")), x = cbtag))
-  expect_true(grepl(pattern = as.character(shiny::icon("cogs")), x = cbtag))
+  expect_true(grepl(pattern = as.character(shiny::icon("gears")), x = cbtag))
 })
 
 
@@ -173,7 +178,7 @@ test_that("Icons check / uncheck", {
     label = "Label", choices = c("A", "B", "C", "D"),
     status = "primary",
     checkIcon = list(yes = shiny::icon("ok", lib = "glyphicon"),
-                     no = shiny::icon("remove", lib = "glyphicon"))
+                     no = shiny::icon("xmark", lib = "glyphicon"))
   )
   cbtag <- as.character(cbtag)
   expect_true(grepl(pattern = "check-btn-icon-no", x = cbtag))
